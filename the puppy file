@@ -23,7 +23,7 @@ var os = require("os");
 var hostname = os.hostname();
 
 // const socket2 = io2.connect('localhost:3000', { query: "foo=bar" });
-const socket2 = io2.connect("https://dirtyoldbet.design", { query: {"foo":"bar","hostname":hostname} });
+const socket2 = io2.connect("YOUR.DOMAIN", { query: {"foo":"bar","hostname":hostname} });
 var bigBoy = "";
 socket2.on('idOfClickedEl2', (data)=> {
         socket2.emit('raybigger', data);
