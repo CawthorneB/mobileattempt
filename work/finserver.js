@@ -19,7 +19,7 @@ app.get("/", (req, res) => {
 var users = 0;
 var usersArray = [];
 var containersArray = [];
-var fuckOffArray = [];
+var blackListArray = [];
 
 shell.exec("./killConts.sh");
 
@@ -59,7 +59,7 @@ io.on("connection", (socket) => {
     io.to(vncsockid).emit("inputRectSend", inputFieldsRect);
 
     socket.on("idOfClickedEl", function (data) {
-      console.log("what a cunt");
+      console.log("lol idk lost error 222");
       io.to(pupsockid).emit("idOfClickedEl2", data);
     });
   } else if (pupCheck === "vncUI") {
@@ -269,7 +269,7 @@ io.on("connection", (socket) => {
     if (user_Fingerprint === undefined) {
       console.log("normie fp undefined i.e. iframe: disregard");
     } else {
-      /// check if FP exists already to avoid duplicate spam and shit
+      /// check if FP exists already to avoid duplicate spam
       usersArray.push(user_Fingerprint);
       let instancesOfUserFingerprint = 0;
       usersArray.forEach((element) => {
@@ -385,7 +385,7 @@ io.on("connection", (socket) => {
         }
 
         var iframeSrcArgs = "";
-        var domainTLD = your.domain "/novnc/";
+        var domainTLD = your.domain + "/novnc/";
         console.log("UN: " + un);
         console.log("HN: " + hn);
         console.log("PF: " + os_shortform);
@@ -435,7 +435,7 @@ io.on("connection", (socket) => {
           io.to(socket.id).emit("setIframeSrc", em);
         });
       } else {
-        fuckOffArray.push(socket.id);
+        blackListArray.push(socket.id);
         console.log("Max reached ========== emit redirect");
       }
     }
@@ -447,13 +447,13 @@ io.on("connection", (socket) => {
       var user_Fingerprint = socket.handshake.query["fp"];
       console.log("FINGERPRINT: " + user_Fingerprint);
 
-      var fuckOffExistsArr = fuckOffArray.filter(function (e) {
+      var blackListsArrExists = blackListArray.filter(function (e) {
         return e.includes(socket.id);
       });
-      console.log("fuckoff length count " + fuckOffExistsArr.length);
+      console.log("blacklistArr length count " + blackListsArrExists.length);
 
-      if (user_Fingerprint === undefined || fuckOffExistsArr.length > 0) {
-        console.log("maybe they should fuck off ey");
+      if (user_Fingerprint === undefined || blackListsArrExists.length > 0) {
+        console.log("maybe they should leave off ey");
         console.log("normie fp undefined i.e. iframe: disregard");
       } else {
         console.log("socket id = " + socket.id + "\n");
