@@ -1,4 +1,4 @@
-# mobileattempt - I am noob but I think there's nuggets of value here. This is proof of concept please don't use it for anything bad.
+# mobileattempt - I am noob but I think there's nuggets of value here. This is proof of concept please use it responsibly for good.
 trying to solve mobile as a github noob
 
 This includes a nodeJS server and basic nginx template (hardcoded - probably investigate ngx-lua or similar to make dynamic). 
