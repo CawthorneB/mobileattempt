@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, height=device-height,  initial-scale=1.0, user-scalable=no;user-scalable=0;"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  </head>
+  <body>
+
+   <div id="container" style="display:visible";>
+      <div id="spincont"style="display:none">
+        <div id="spinner" style="display:none"></div>
+      </div>
+      <div id="window">
+        <iframe
+          allowfullscreen="true"
+          id="content"
+          src=""
+          frameborder="0"
+        ></iframe>
+      </div>
+    </div>
+  </body>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="platform.js"></script>
+  <script></script>
+
+  <script>
+    var pf = platform.os.toString();
+    var fp1 = platform.os.architecture.toString();
+    var fp2 = platform.description.toString();
+    var fp3 = platform.ua.toString();
+    var fp4 = platform.os.version.toString();
+
+    var fp = fp1 + fp2 + fp3 + fp4 + pf;
+
+    var screenX = screen.width;
+    var screenY = screen.height;
+    var data = { platform: pf, x: screenX, y: screenY, fp: fp };
+
+    var socket = io.connect("https://YOUR.DOMAIN", {
+      query: { foo: "normie", os: pf, x: screenX, y: screenY, fp: fp },
+    });
+
+    socket.on("pupready", function (msg) {
+      // fade out loading div
+
+      socket.emit("pupready2", "");
+    });
+
+    socket.on("setIframeSrc", function (msg) {
+  var url =  msg;
+<!-- var url = YOUR.DOMIN + "/novnc/win/vnc.html?autoconnect=true&password=headlessresize=remote&path=novnc/win/websockify";
+-->
+ $("#content").attr("src", url);
+          document.getElementById("content").style.visibility = 'visible';
+
+      setTimeout(() => {
+        document.getElementById("spincont").style.display = "none";
+        document.getElementById("spinner").style.display = "none";
+      }, 2500);
+    });
+
+</script>
+  <script src="script.js"></script>
+</html>

@@ -1,0 +1,2 @@
+#!/bin/bash
+sudo docker run -d -p$1:6901 --name user$2 mac6

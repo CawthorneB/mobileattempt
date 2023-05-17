@@ -1,0 +1,3 @@
+#!/bin/bash
+
+sudo docker exec $1 sh -c "env DISPLAY=:1 node /home/headless/pup/index.js"

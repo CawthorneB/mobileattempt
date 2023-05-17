@@ -1,0 +1,3 @@
+#!/bin/bash
+
+sudo docker exec user$1 sh -c "cat /etc/hostname"

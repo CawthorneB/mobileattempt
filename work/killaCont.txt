@@ -1,0 +1,4 @@
+#!/bin/bash
+
+docker kill user$1
+docker rm user$1

@@ -1,0 +1,35 @@
+html,
+body {
+  background-color: white;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+}
+
+#content {
+  border: 0px;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  top: 0%;
+  scrolling: no;
+  position: absolute;
+  display: block;
+}
+
+#window {
+  scrolling: no;
+  overflow: hidden;
+  color: transparent;
+  background-color: transparent;
+  border-color: transparent;
+  z-index: 7;
+  width: 626px;
+  height: 100%;
+  margin: 0 auto;
+  display: flex;
+  position: absolute;
+  align-items: center; /* vertical */
+  justify-content: center;
+}

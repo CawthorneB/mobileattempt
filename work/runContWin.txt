@@ -1,0 +1,1 @@
+sudo docker run -d --net  mynet123 --ip $1 -p $2:6901 --hostname $3  --name $4 win38

@@ -1,0 +1,9 @@
+#!/bin/bash
+
+
+wank=$(docker inspect $1 |grep -i user)
+
+arrWank=(${wank//:/ })
+
+
+echo ${arrWank[1]}

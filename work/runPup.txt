@@ -1,0 +1,3 @@
+#!/bin/bash
+
+sudo docker exec -d user$1 sh -c "env DISPLAY=:1 node /home/headless/work/desktop.js"
