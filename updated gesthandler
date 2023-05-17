@@ -10,7 +10,7 @@
 import { io } from "https://cdn.socket.io/4.4.1/socket.io.esm.min.js";
 
 
-  var socket = io.connect('https://dirtyoldbet.design', { query:{ "foo":"vncGest","url":window.location.href}});
+  var socket = io.connect('YOUR.DOMAIN', { query:{ "foo":"vncGest","url":window.location.href}});
 
 const GH_NOGESTURE = 0;
 const GH_ONETAP    = 1;
